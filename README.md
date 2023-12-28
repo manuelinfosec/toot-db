@@ -75,7 +75,7 @@ Execute `cargo test` to run all tests, or check out the latest
 
 ## Performance
 
-Performance is not a primary goal of toyDB, but it has a bank simulation as a basic gauge of
+Performance is not a primary goal of tootDB, but it has a bank simulation as a basic gauge of
 throughput and correctness. This creates a set of customers and accounts, and spawns several
 concurrent workers that make random transfers between them, retrying serialization failures and
 verifying invariants:
