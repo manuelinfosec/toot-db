@@ -1,4 +1,4 @@
-# <a><img src="./docs/images/toydb.svg" height="40" valign="top" /></a> toyDB
+<!-- # <a><img src="./docs/images/toydb.svg" height="40" valign="top" /></a> toyDB -->
 
 [![Build Status](https://cloud.drone.io/api/badges/erikgrinaker/toydb/status.svg)](https://cloud.drone.io/erikgrinaker/toydb)
 
