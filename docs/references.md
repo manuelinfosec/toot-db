@@ -1,6 +1,6 @@
 # References
 
-The following is some of the most useful research material I found while building toyDB. It 
+The following is some of the most useful research material I found while building tootDB. It 
 is a subset of my [reading list](https://github.com/erikgrinaker/readings).
 
 ## Introduction
@@ -38,7 +38,7 @@ programming language:
 - 📖 [Writing An Interpreter In Go](https://interpreterbook.com) (T Ball 2016) 
 - 📖 [Writing A Compiler In Go](https://compilerbook.com) (T Ball 2018)
 
-The toyDB expression parser is inspired by a blog post by Eli Bendersky describing the precedence
+The tootDB expression parser is inspired by a blog post by Eli Bendersky describing the precedence
 climbing algorithm, which is the algorithm I found the most elegant:
 
 - 💬 [Parsing Expressions by Precedence Climbing](https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing) (E Bendersky 2012)
@@ -51,7 +51,7 @@ is very helpful in making sense of the jungle of overlapping and ill-defined ter
 - 🔗 [Consistency Models](https://jepsen.io/consistency) (Jepsen 2016)
 
 For more background on this, in particular on how snapshot isolation provided by the MVCC 
-transaction engine used in toyDB does not fit into the traditional SQL isolation levels, the 
+transaction engine used in tootDB does not fit into the traditional SQL isolation levels, the 
 following classic papers were useful:
 
 - 📄 [A Critique of ANSI SQL Isolation Levels](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-95-51.pdf) (H Berenson et al 1995)

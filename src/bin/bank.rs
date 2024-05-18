@@ -1,7 +1,7 @@
 /*
  * Simulates a bank, by creating a set of accounts and making concurrent transfers between them:
  *
- * - Connect to the given toyDB hosts (-h default 127.0.0.1:9605, can give multiple)
+ * - Connect to the given tootDB hosts (-h default 127.0.0.1:9605, can give multiple)
  * - Create C customers (-C default 100)
  * - Create a accounts per customer with initial balance 100 (-a default 10)
  * - Spawn c concurrent workers (-c default 8)
@@ -24,8 +24,8 @@ use rand::Rng as _;
 use std::cell::Cell;
 use std::rc::Rc;
 use tokio::net::ToSocketAddrs;
-use toydb::client::Pool;
-use toydb::error::{Error, Result};
+use tootdb::client::Pool;
+use tootdb::error::{Error, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -1,6 +1,6 @@
-<!-- # <a><img src="./docs/images/toydb.svg" height="40" valign="top" /></a> toyDB -->
+<!-- # <a><img src="./docs/images/tootdb.svg" height="40" valign="top" /></a> tootDB -->
 
-[![Build Status](https://cloud.drone.io/api/badges/erikgrinaker/toydb/status.svg)](https://cloud.drone.io/erikgrinaker/toydb)
+[![Build Status](https://cloud.drone.io/api/badges/erikgrinaker/tootdb/status.svg)](https://cloud.drone.io/erikgrinaker/tootdb)
 
 Distributed SQL database in Rust, written as a learning project. Most components are built from
 scratch, including:
@@ -42,9 +42,9 @@ A command-line client can be built and used with the node on `localhost` port `9
 ```
 $ cargo run --release --bin tootsql
 Connected to tootDB node "tootdb-e". Enter !help for instructions.
-toydb> CREATE TABLE movies (id INTEGER PRIMARY KEY, title VARCHAR NOT NULL);
-toydb> INSERT INTO movies VALUES (1, 'Sicario'), (2, 'Stalker'), (3, 'Her');
-toydb> SELECT * FROM movies;
+tootdb> CREATE TABLE movies (id INTEGER PRIMARY KEY, title VARCHAR NOT NULL);
+tootdb> INSERT INTO movies VALUES (1, 'Sicario'), (2, 'Stalker'), (3, 'Her');
+tootdb> SELECT * FROM movies;
 1|Sicario
 2|Stalker
 3|Her
@@ -64,14 +64,14 @@ key/value store managed by a Raft cluster with a SQL query engine on top. See th
 
 tootDB has decent test coverage, with about a thousand tests of core functionality. These consist
 of in-code unit-tests for many low-level components, golden master integration tests of the SQL
-engine under [`tests/sql`](https://github.com/erikgrinaker/toydb/tree/master/tests/sql), and a
+engine under [`tests/sql`](https://github.com/erikgrinaker/tootdb/tree/master/tests/sql), and a
 basic set of end-to-end cluster tests under
-[`tests/`](https://github.com/erikgrinaker/toydb/tree/master/tests).
+[`tests/`](https://github.com/erikgrinaker/tootdb/tree/master/tests).
 [Jepsen tests](https://jepsen.io), or similar system-wide correctness and reliability tests, are 
 desirable but not yet implemented.
 
 Execute `cargo test` to run all tests, or check out the latest
-[CI run](https://cloud.drone.io/erikgrinaker/toydb).
+[CI run](https://cloud.drone.io/erikgrinaker/tootdb).
 
 ## Performance
 

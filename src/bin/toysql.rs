@@ -1,5 +1,5 @@
 /*
- * toysql is a command-line client for toyDB. It connects to a toyDB cluster node and executes SQL
+ * tootsql is a command-line client for tootDB. It connects to a tootDB cluster node and executes SQL
  * queries against it via a REPL interface.
  */
 
@@ -9,11 +9,11 @@ use clap::{app_from_crate, crate_authors, crate_description, crate_name, crate_v
 use rustyline::validate::{ValidationContext, ValidationResult, Validator};
 use rustyline::{error::ReadlineError, Editor, Modifiers};
 use rustyline_derive::{Completer, Helper, Highlighter, Hinter};
-use toydb::error::{Error, Result};
-use toydb::sql::engine::Mode;
-use toydb::sql::execution::ResultSet;
-use toydb::sql::parser::{Lexer, Token};
-use toydb::Client;
+use tootdb::error::{Error, Result};
+use tootdb::sql::engine::Mode;
+use tootdb::sql::execution::ResultSet;
+use tootdb::sql::parser::{Lexer, Token};
+use tootdb::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -40,36 +40,36 @@ async fn main() -> Result<()> {
         )
         .get_matches();
 
-    let mut toysql =
-        ToySQL::new(opts.value_of("host").unwrap(), opts.value_of("port").unwrap().parse()?)
+    let mut tootsql =
+        tootSQL::new(opts.value_of("host").unwrap(), opts.value_of("port").unwrap().parse()?)
             .await?;
     if opts.is_present("headers") {
-        toysql.show_headers = true
+        tootsql.show_headers = true
     }
 
     if let Some(command) = opts.value_of("command") {
-        toysql.execute(command).await
+        tootsql.execute(command).await
     } else {
-        toysql.run().await
+        tootsql.run().await
     }
 }
 
-/// The ToySQL REPL
-struct ToySQL {
+/// The tootSQL REPL
+struct tootSQL {
     client: Client,
     editor: Editor<InputValidator>,
     history_path: Option<std::path::PathBuf>,
     show_headers: bool,
 }
 
-impl ToySQL {
-    /// Creates a new ToySQL REPL for the given server host and port
+impl tootSQL {
+    /// Creates a new tootSQL REPL for the given server host and port
     async fn new(host: &str, port: u16) -> Result<Self> {
         Ok(Self {
             client: Client::new((host, port)).await?,
             editor: Editor::new(),
             history_path: std::env::var_os("HOME")
-                .map(|home| std::path::Path::new(&home).join(".toysql.history")),
+                .map(|home| std::path::Path::new(&home).join(".tootsql.history")),
             show_headers: false,
         })
     }
@@ -212,10 +212,10 @@ SQL txns:  {txns_active} active, {txns} total ({sql_storage} storage)
     /// Prompts the user for input
     fn prompt(&mut self) -> Result<Option<String>> {
         let prompt = match self.client.txn() {
-            Some((id, Mode::ReadWrite)) => format!("toydb:{}> ", id),
-            Some((id, Mode::ReadOnly)) => format!("toydb:{}> ", id),
-            Some((_, Mode::Snapshot { version })) => format!("toydb@{}> ", version),
-            None => "toydb> ".into(),
+            Some((id, Mode::ReadWrite)) => format!("tootdb:{}> ", id),
+            Some((id, Mode::ReadOnly)) => format!("tootdb:{}> ", id),
+            Some((_, Mode::Snapshot { version })) => format!("tootdb@{}> ", version),
+            None => "tootdb> ".into(),
         };
         match self.editor.readline(&prompt) {
             Ok(input) => {
@@ -227,7 +227,7 @@ SQL txns:  {txns_active} active, {txns} total ({sql_storage} storage)
         }
     }
 
-    /// Runs the ToySQL REPL
+    /// Runs the tootSQL REPL
     async fn run(&mut self) -> Result<()> {
         if let Some(path) = &self.history_path {
             match self.editor.load_history(path) {
@@ -245,7 +245,7 @@ SQL txns:  {txns_active} active, {txns} total ({sql_storage} storage)
 
         let status = self.client.status().await?;
         println!(
-            "Connected to toyDB node \"{}\". Enter !help for instructions.",
+            "Connected to tootDB node \"{}\". Enter !help for instructions.",
             status.raft.server
         );
 

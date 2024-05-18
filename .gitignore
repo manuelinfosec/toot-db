@@ -1,4 +1,4 @@
-/clusters/*/toydb-?/data
+/clusters/*/tootdb-?/data
 /target
 .vscode/
 **/*.rs.bk

@@ -1,7 +1,7 @@
 use super::super::{assert_rows, setup};
 
-use toydb::error::Result;
-use toydb::sql::types::Value;
+use tootdb::error::Result;
+use tootdb::sql::types::Value;
 
 use futures::future::FutureExt as _;
 use pretty_assertions::assert_eq;
@@ -30,7 +30,7 @@ async fn get() -> Result<()> {
     }
     assert_eq!(
         servers,
-        HashSet::from_iter(vec!["toydb0".into(), "toydb1".into(), "toydb2".into()])
+        HashSet::from_iter(vec!["tootdb0".into(), "tootdb1".into(), "tootdb2".into()])
     );
     assert_eq!(ids, HashSet::from_iter(vec![0, 1, 2, 3, 4]));
 

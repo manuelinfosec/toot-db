@@ -1,10 +1,10 @@
-id: toydb-c
-data_dir: toydb-c/data
+id: tootdb-c
+data_dir: tootdb-c/data
 sync: false
 listen_sql: 0.0.0.0:9603
 listen_raft: 0.0.0.0:9703
 peers:
-  toydb-a: 127.0.0.1:9701
-  toydb-b: 127.0.0.1:9702
-  toydb-d: 127.0.0.1:9704
-  toydb-e: 127.0.0.1:9705
+  tootdb-a: 127.0.0.1:9701
+  tootdb-b: 127.0.0.1:9702
+  tootdb-d: 127.0.0.1:9704
+  tootdb-e: 127.0.0.1:9705

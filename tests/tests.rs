@@ -5,8 +5,8 @@ mod cluster;
 mod setup;
 mod sql;
 
-use toydb::sql::execution::ResultSet;
-use toydb::sql::types::Row;
+use tootdb::sql::execution::ResultSet;
+use tootdb::sql::types::Row;
 
 use pretty_assertions::assert_eq;
 

@@ -1,9 +1,9 @@
 #![allow(clippy::implicit_hasher)]
 
-use toydb::client::{Client, Pool};
-use toydb::error::Result;
-use toydb::server::Server;
-use toydb::storage;
+use tootdb::client::{Client, Pool};
+use tootdb::error::Result;
+use tootdb::server::Server;
+use tootdb::storage;
 
 use futures_util::future::FutureExt as _;
 use pretty_assertions::assert_eq;
@@ -74,7 +74,7 @@ pub async fn server(
     addr_raft: &str,
     peers: HashMap<String, String>,
 ) -> Result<Teardown> {
-    let dir = TempDir::new("toydb")?;
+    let dir = TempDir::new("tootdb")?;
     let mut srv = Server::new(
         id,
         peers,
@@ -129,7 +129,7 @@ pub async fn cluster_with_clients(
     let mut nodes = HashMap::new();
     for i in 0..size {
         nodes.insert(
-            format!("toydb{}", i),
+            format!("tootdb{}", i),
             (format!("127.0.0.1:{}", 9605 + i), format!("127.0.0.1:{}", 9705 + i)),
         );
     }
@@ -163,7 +163,7 @@ pub async fn cluster_with_pool(
     let mut nodes = HashMap::new();
     for i in 0..cluster_size {
         nodes.insert(
-            format!("toydb{}", i),
+            format!("tootdb{}", i),
             (format!("127.0.0.1:{}", 9605 + i), format!("127.0.0.1:{}", 9705 + i)),
         );
     }

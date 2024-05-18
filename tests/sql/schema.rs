@@ -1,7 +1,7 @@
 ///! Schema-related tests, using an in-memory database against golden files in tests/sql/chema/
-use toydb::error::Result;
-use toydb::sql::engine::{Engine as _, Mode, Transaction as _};
-use toydb::sql::schema::Catalog as _;
+use tootdb::error::Result;
+use tootdb::sql::engine::{Engine as _, Mode, Transaction as _};
+use tootdb::sql::schema::Catalog as _;
 
 use goldenfile::Mint;
 use std::io::Write;

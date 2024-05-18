@@ -1123,7 +1123,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "toydb"
+name = "toot-db"
 version = "0.1.0"
 dependencies = [
  "bincode",

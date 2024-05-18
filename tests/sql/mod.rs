@@ -3,9 +3,9 @@ mod mutation;
 mod query;
 mod schema;
 
-use toydb::error::Result;
-use toydb::sql::engine::{Engine, KV};
-use toydb::storage::kv;
+use tootdb::error::Result;
+use tootdb::sql::engine::{Engine, KV};
+use tootdb::storage::kv;
 
 /// Sets up a basic in-memory SQL engine with an initial dataset.
 fn setup(queries: Vec<&str>) -> Result<KV> {

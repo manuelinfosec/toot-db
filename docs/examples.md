@@ -1,6 +1,6 @@
 # SQL Examples
 
-The following examples demonstrate some of toyDB's SQL features. For more details, see the
+The following examples demonstrate some of tootDB's SQL features. For more details, see the
 [SQL reference](sql.md).
 
 - [Setup](#setup)
@@ -21,35 +21,35 @@ To start a five-node cluster on the local machine (requires a working
 
 ```
 $ (cd clusters/local && ./run.sh)
-toydb-b 19:06:28 [ INFO] Listening on 0.0.0.0:9602 (SQL) and 0.0.0.0:9702 (Raft)
-toydb-b 19:06:28 [ERROR] Failed connecting to Raft peer 127.0.0.1:9705: Connection refused
-toydb-e 19:06:28 [ INFO] Listening on 0.0.0.0:9605 (SQL) and 0.0.0.0:9705 (Raft)
+tootdb-b 19:06:28 [ INFO] Listening on 0.0.0.0:9602 (SQL) and 0.0.0.0:9702 (Raft)
+tootdb-b 19:06:28 [ERROR] Failed connecting to Raft peer 127.0.0.1:9705: Connection refused
+tootdb-e 19:06:28 [ INFO] Listening on 0.0.0.0:9605 (SQL) and 0.0.0.0:9705 (Raft)
 [...]
-toydb-e 19:06:29 [ INFO] Voting for toydb-d in term 1 election
-toydb-c 19:06:29 [ INFO] Voting for toydb-d in term 1 election
-toydb-d 19:06:29 [ INFO] Won election for term 1, becoming leader
+tootdb-e 19:06:29 [ INFO] Voting for tootdb-d in term 1 election
+tootdb-c 19:06:29 [ INFO] Voting for tootdb-d in term 1 election
+tootdb-d 19:06:29 [ INFO] Won election for term 1, becoming leader
 ```
 
-In a separate terminal, start a `toysql` client and check the server status:
+In a separate terminal, start a `tootsql` client and check the server status:
 
 ```
-$ cargo run --release --bin toysql
-Connected to toyDB node "toydb-e". Enter !help for instructions.
-toydb> !status
+$ cargo run --release --bin tootsql
+Connected to tootDB node "tootdb-e". Enter !help for instructions.
+tootdb> !status
 
-Server:    toydb-e (leader toydb-d in term 1 with 5 nodes)
+Server:    tootdb-e (leader tootdb-d in term 1 with 5 nodes)
 Raft log:  1 committed, 0 applied, 0.000 MB (hybrid storage)
-Node logs: toydb-a:1 toydb-b:1 toydb-c:1 toydb-d:1 toydb-e:1
+Node logs: tootdb-a:1 tootdb-b:1 tootdb-c:1 tootdb-d:1 tootdb-e:1
 SQL txns:  0 active, 0 total (memory storage)
 ```
 
-The cluster is shut down by pressing Ctrl-C. Data is saved under `clusters/local/toydb-?/data/`,
+The cluster is shut down by pressing Ctrl-C. Data is saved under `clusters/local/tootdb-?/data/`,
 delete the contents to start over.
 
 ## Creating Tables and Data
 
 As a basis for later examples, we'll create a small movie database. The following SQL statements
-can be pasted into `toysql`:
+can be pasted into `tootsql`:
 
 ```sql
 CREATE TABLE genres (
@@ -96,19 +96,19 @@ INSERT INTO movies VALUES
     (12, 'Eternal Sunshine of the Spotless Mind', 5, 3, 2004, 8.3);
 ```
 
-toyDB supports some basic datatypes, as well as primary keys, foreign keys, and column indexes.
+tootDB supports some basic datatypes, as well as primary keys, foreign keys, and column indexes.
 For more information on these, see the [SQL reference](sql.md). Schema changes such as
 `ALTER TABLE` are not supported, only `CREATE TABLE` and `DROP TABLE`.
 
 The tables can be inspected via the `!tables` and `!table` commands:
 
 ```sql
-toydb> !tables
+tootdb> !tables
 genres
 movies
 studios
 
-toydb> !table genres
+tootdb> !table genres
 CREATE TABLE genres (
   id INTEGER PRIMARY KEY,
   name STRING NOT NULL
@@ -120,22 +120,22 @@ CREATE TABLE genres (
 Schemas enforce referential integrity and other constraints:
 
 ```sql
-toydb> DROP TABLE studios;
+tootdb> DROP TABLE studios;
 Error: Table studios is referenced by table movies column studio_id
 
-toydb> DELETE FROM studios WHERE id = 1;
+tootdb> DELETE FROM studios WHERE id = 1;
 Error: Primary key 1 is referenced by table movies column studio_id
 
-toydb> UPDATE movies SET id = 1;
+tootdb> UPDATE movies SET id = 1;
 Error: Primary key 1 already exists for table movies
 
-toydb> INSERT INTO movies VALUES (13, 'Nebraska', 6, 3, 2013, 7.7);
+tootdb> INSERT INTO movies VALUES (13, 'Nebraska', 6, 3, 2013, 7.7);
 Error: Referenced primary key 6 in table studios does not exist
 
-toydb> INSERT INTO movies VALUES (13, 'Nebraska', NULL, 3, 2013, 7.7);
+tootdb> INSERT INTO movies VALUES (13, 'Nebraska', NULL, 3, 2013, 7.7);
 Error: NULL value not allowed for column studio_id
 
-toydb> INSERT INTO movies VALUES (13, 'Nebraska', 'Unknown', 3, 2013, 7.7);
+tootdb> INSERT INTO movies VALUES (13, 'Nebraska', 'Unknown', 3, 2013, 7.7);
 Error: Invalid datatype STRING for INTEGER column studio_id
 ```
 
@@ -144,14 +144,14 @@ Error: Invalid datatype STRING for INTEGER column studio_id
 Most basic SQL query functionality is supported:
 
 ```sql
-toydb> SELECT * FROM studios;
+tootdb> SELECT * FROM studios;
 1|Mosfilm
 2|Lionsgate
 3|StudioCanal
 4|Warner Bros
 5|Focus Features
 
-toydb> SELECT title, rating FROM movies WHERE released >= 2000 ORDER BY rating DESC LIMIT 3;
+tootdb> SELECT title, rating FROM movies WHERE released >= 2000 ORDER BY rating DESC LIMIT 3;
 Inception|8.8
 Eternal Sunshine of the Spotless Mind|8.3
 Gravity|7.7
@@ -160,10 +160,10 @@ Gravity|7.7
 Column headers can be enabled with `!headers on`:
 
 ```sql
-toydb> !headers on
+tootdb> !headers on
 Headers enabled
 
-toydb> SELECT id, name AS genre FROM genres;
+tootdb> SELECT id, name AS genre FROM genres;
 id|genre
 1|Science Fiction
 2|Action
@@ -176,10 +176,10 @@ id|genre
 All common mathematical operators are implemented:
 
 ```sql
-toydb> SELECT 1 + 2 * 3;
+tootdb> SELECT 1 + 2 * 3;
 7
 
-toydb> SELECT (1 + 2) * 4 / -3;
+tootdb> SELECT (1 + 2) * 4 / -3;
 -4
 
 SELECT 3! + 7 % 4 - 2 ^ 3;
@@ -189,58 +189,58 @@ SELECT 3! + 7 % 4 - 2 ^ 3;
 64-bit floating point arithmetic is also supported, including infinity and NaN:
 
 ```sql
-toydb> SELECT 3.14 * 2.718;
+tootdb> SELECT 3.14 * 2.718;
 8.53452
 
-toydb> SELECT 1.0 / 0.0;
+tootdb> SELECT 1.0 / 0.0;
 inf
 
-toydb> SELECT 1e10 ^ 8;
+tootdb> SELECT 1e10 ^ 8;
 100000000000000000000000000000000000000000000000000000000000000000000000000000000
 
-toydb> SELECT 1e10 ^ 8 / INFINITY, 1e10 ^ 1e10, INFINITY / INFINITY;
+tootdb> SELECT 1e10 ^ 8 / INFINITY, 1e10 ^ 1e10, INFINITY / INFINITY;
 0|inf|NaN
 ```
 
 And of course three-valued logic:
 
 ```sql
-toydb> SELECT TRUE AND TRUE, TRUE AND FALSE, TRUE AND NULL, FALSE AND NULL;
+tootdb> SELECT TRUE AND TRUE, TRUE AND FALSE, TRUE AND NULL, FALSE AND NULL;
 TRUE|FALSE|NULL|FALSE
 
-toydb> SELECT TRUE OR FALSE, FALSE OR FALSE, TRUE OR NULL, FALSE OR NULL;
+tootdb> SELECT TRUE OR FALSE, FALSE OR FALSE, TRUE OR NULL, FALSE OR NULL;
 TRUE|FALSE|TRUE|NULL
 
-toydb> SELECT NOT TRUE, NOT FALSE, NOT NULL;
+tootdb> SELECT NOT TRUE, NOT FALSE, NOT NULL;
 FALSE|TRUE|NULL
 ```
 
 Which would be useless without comparison operators for all types:
 
 ```sql
-toydb> SELECT 3 > 1, 3 <= 1, 3 = 3.0;
+tootdb> SELECT 3 > 1, 3 <= 1, 3 = 3.0;
 TRUE|FALSE|TRUE
 
-toydb> SELECT 'a' = 'A', 'foo' > 'bar', '👍' != '👎';
+tootdb> SELECT 'a' = 'A', 'foo' > 'bar', '👍' != '👎';
 FALSE|TRUE|TRUE
 
-toydb> SELECT INFINITY > -INFINITY, NULL = NULL;
+tootdb> SELECT INFINITY > -INFINITY, NULL = NULL;
 TRUE|NULL
 ```
 
 ## Joins
 
-No SQL database would be complete without joins, and toyDB supports most join types such as
+No SQL database would be complete without joins, and tootDB supports most join types such as
 inner joins (both implicit and explicit):
 
 ```sql
-toydb> SELECT m.id, m.title, g.name FROM movies m JOIN genres g ON m.genre_id = g.id LIMIT 4;
+tootdb> SELECT m.id, m.title, g.name FROM movies m JOIN genres g ON m.genre_id = g.id LIMIT 4;
 1|Stalker|Science Fiction
 2|Sicario|Action
 3|Primer|Science Fiction
 4|Heat|Action
 
-toydb> SELECT m.id, m.title, g.name FROM movies m, genres g WHERE m.genre_id = g.id LIMIT 4;
+tootdb> SELECT m.id, m.title, g.name FROM movies m, genres g WHERE m.genre_id = g.id LIMIT 4;
 1|Stalker|Science Fiction
 2|Sicario|Action
 3|Primer|Science Fiction
@@ -250,14 +250,14 @@ toydb> SELECT m.id, m.title, g.name FROM movies m, genres g WHERE m.genre_id = g
 Left and right outer joins:
 
 ```sql
-toydb> SELECT s.id, s.name, g.name FROM studios s LEFT JOIN genres g ON s.id = g.id;
+tootdb> SELECT s.id, s.name, g.name FROM studios s LEFT JOIN genres g ON s.id = g.id;
 1|Mosfilm|Science Fiction
 2|Lionsgate|Action
 3|StudioCanal|Drama
 4|Warner Bros|Comedy
 5|Focus Features|NULL
 
-toydb> SELECT g.id, g.name, s.name FROM genres g RIGHT JOIN studios s ON g.id = s.id;
+tootdb> SELECT g.id, g.name, s.name FROM genres g RIGHT JOIN studios s ON g.id = s.id;
 1|Science Fiction|Mosfilm
 2|Action|Lionsgate
 3|Drama|StudioCanal
@@ -268,7 +268,7 @@ NULL|NULL|Focus Features
 And cross joins (both implicit and explicit):
 
 ```sql
-toydb> SELECT g.name, s.name FROM genres g, studios s WHERE s.name < 'S';
+tootdb> SELECT g.name, s.name FROM genres g, studios s WHERE s.name < 'S';
 Science Fiction|Mosfilm
 Science Fiction|Lionsgate
 Science Fiction|Focus Features
@@ -287,7 +287,7 @@ We can join on arbitrary predicates, such as joining movies with any genres whos
 ordered after the movie's title:
 
 ```sql
-toydb>  SELECT   m.title, g.name
+tootdb>  SELECT   m.title, g.name
         FROM     movies m JOIN genres g ON g.name > m.title
         ORDER BY m.title, g.name;
 
@@ -311,7 +311,7 @@ where we find all science fiction movies released since 2000 by studios that hav
 movie rated 8 or higher:
 
 ```sql
-toydb> SELECT   m.id, m.title, g.name AS genre, m.released, s.name AS studio
+tootdb> SELECT   m.id, m.title, g.name AS genre, m.released, s.name AS studio
        FROM     movies m JOIN genres g ON m.genre_id = g.id,
                 studios s JOIN movies good ON good.studio_id = s.id AND good.rating >= 8
        WHERE    m.studio_id = s.id AND m.released >= 2000 AND g.id = 1
@@ -328,7 +328,7 @@ When optimizing complex queries with several joins, it can often be useful to in
 plan via an `EXPLAIN` query:
 
 ```sql
-toydb> EXPLAIN
+tootdb> EXPLAIN
        SELECT   m.id, m.title, g.name AS genre, m.released, s.name AS studio
        FROM     movies m JOIN genres g ON m.genre_id = g.id,
                 studios s JOIN movies good ON good.studio_id = s.id AND good.rating >= 8
@@ -358,14 +358,14 @@ joined to produce the final result, which is then formatted and sorted.
 Most basic aggregate functions are supported:
 
 ```sql
-toydb> SELECT COUNT(*), MIN(rating), MAX(rating), AVG(rating), SUM(rating) FROM movies;
+tootdb> SELECT COUNT(*), MIN(rating), MAX(rating), AVG(rating), SUM(rating) FROM movies;
 12|6.9|8.8|7.841666666666668|94.10000000000001
 ```
 
 We can group by values and filter the aggregate results:
 
 ```sql
-toydb> SELECT s.id, s.name, AVG(m.rating) AS average
+tootdb> SELECT s.id, s.name, AVG(m.rating) AS average
        FROM movies m JOIN studios s ON m.studio_id = s.id
        GROUP BY s.id, s.name
        HAVING average > 7.8
@@ -378,7 +378,7 @@ toydb> SELECT s.id, s.name, AVG(m.rating) AS average
 And we can combine aggregate functions with arbitrary expressions, both inside and outside:
 
 ```sql
-toydb> SELECT s.id, s.name, ((MAX(rating^2) - MIN(rating^2)) / AVG(rating^2)) ^ (0.5) AS spread
+tootdb> SELECT s.id, s.name, ((MAX(rating^2) - MIN(rating^2)) / AVG(rating^2)) ^ (0.5) AS spread
        FROM movies m JOIN studios s ON m.studio_id = s.id
        GROUP BY s.id, s.name
        HAVING MAX(rating) - MIN(rating) > 0.5
@@ -389,26 +389,26 @@ toydb> SELECT s.id, s.name, ((MAX(rating^2) - MIN(rating^2)) / AVG(rating^2)) ^ 
 
 ## Transactions
 
-toyDB supports ACID transactions via MVCC-based snapshot isolation. This provides atomic
+tootDB supports ACID transactions via MVCC-based snapshot isolation. This provides atomic
 transactions with good isolation, without taking out locks or blocking reads on writes. As a basic
 example, the below transaction is rolled back without taking effect, as opposed to `COMMIT`
 which would make it permanent:
 
 ```sql
-toydb> BEGIN;
+tootdb> BEGIN;
 Began transaction 131
 
-toydb:131> INSERT INTO genres VALUES (5, 'Western');
-toydb:131> SELECT * FROM genres;
+tootdb:131> INSERT INTO genres VALUES (5, 'Western');
+tootdb:131> SELECT * FROM genres;
 1|Science Fiction
 2|Action
 3|Drama
 4|Comedy
 5|Western
-toydb:131> ROLLBACK;
+tootdb:131> ROLLBACK;
 Rolled back transaction 131
 
-toydb> SELECT * FROM genres;
+tootdb> SELECT * FROM genres;
 1|Science Fiction
 2|Action
 3|Drama
@@ -416,7 +416,7 @@ toydb> SELECT * FROM genres;
 ```
 
 We'll demonstrate transactions by covering most common transaction anomalies given two
-concurrent sessions, and show how toyDB prevents these anomalies in all cases but one. In these
+concurrent sessions, and show how tootDB prevents these anomalies in all cases but one. In these
 examples, the left half is user A and the right is user B. Time flows downwards such that
 commands on the same line happen at the same time.
 
@@ -520,40 +520,40 @@ a> COMMIT;                                        b> COMMIT;
 ```
 
 Here, the writes actually go through. This anomaly is not protected against by snapshot isolation, 
-and thus not by toyDB either - doing so would require implementing serializable snapshot isolation. 
-However, this is the only common serialization anomaly not handled by toyDB, and is not among the
+and thus not by tootDB either - doing so would require implementing serializable snapshot isolation. 
+However, this is the only common serialization anomaly not handled by tootDB, and is not among the
 most severe.
 
 ## Time-Travel Queries
 
-Since toyDB uses MVCC for transactions and keeps all historical versions, the state of the database
-can be queried at any arbitrary point in the past. toyDB uses incremental transaction IDs as
+Since tootDB uses MVCC for transactions and keeps all historical versions, the state of the database
+can be queried at any arbitrary point in the past. tootDB uses incremental transaction IDs as
 logical timestamps:
 
 ```sql
-toydb> SELECT * FROM genres;
+tootdb> SELECT * FROM genres;
 1|Science Fiction
 2|Drama
 3|Action
 4|Comedy
 
-toydb> BEGIN;
+tootdb> BEGIN;
 Began transaction 173
-toydb:173> UPDATE genres SET name = 'Scifi' WHERE id = 1;
-toydb:173> INSERT INTO genres VALUES (5, 'Western');
-toydb:173> COMMIT;
+tootdb:173> UPDATE genres SET name = 'Scifi' WHERE id = 1;
+tootdb:173> INSERT INTO genres VALUES (5, 'Western');
+tootdb:173> COMMIT;
 Committed transaction 173
 
-toydb> SELECT * FROM genres;
+tootdb> SELECT * FROM genres;
 1|Scifi
 2|Drama
 3|Action
 4|Comedy
 5|Western
 
-toydb> BEGIN READ ONLY AS OF SYSTEM TIME 172;
+tootdb> BEGIN READ ONLY AS OF SYSTEM TIME 172;
 Began read-only transaction 175 in snapshot at version 172
-toydb@172> SELECT * FROM genres;
+tootdb@172> SELECT * FROM genres;
 1|Science Fiction
 2|Drama
 3|Action

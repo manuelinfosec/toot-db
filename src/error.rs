@@ -4,7 +4,7 @@ use std::fmt::{self, Display};
 /// Result returning Error
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// toyDB errors. All except Internal are considered user-facing.
+/// tootDB errors. All except Internal are considered user-facing.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Error {
     Abort,

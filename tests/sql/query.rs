@@ -1,11 +1,11 @@
 ///! Tests for the SQL query engine. Runs SQL queries against an in-memory database,
 ///! and compares the results with golden files stored under tests/sql/query/
-use toydb::error::{Error, Result};
-use toydb::sql::engine::{Engine, Mode, Transaction};
-use toydb::sql::execution::ResultSet;
-use toydb::sql::parser::Parser;
-use toydb::sql::plan::Plan;
-use toydb::sql::types::Row;
+use tootdb::error::{Error, Result};
+use tootdb::sql::engine::{Engine, Mode, Transaction};
+use tootdb::sql::execution::ResultSet;
+use tootdb::sql::parser::Parser;
+use tootdb::sql::plan::Plan;
+use tootdb::sql::types::Row;
 
 use goldenfile::Mint;
 use std::io::Write;

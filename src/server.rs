@@ -17,7 +17,7 @@ use tokio_stream::wrappers::TcpListenerStream;
 use tokio_stream::StreamExt as _;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
-/// A toyDB server.
+/// A tootDB server.
 pub struct Server {
     raft: raft::Server,
     raft_listener: Option<TcpListener>,
@@ -25,7 +25,7 @@ pub struct Server {
 }
 
 impl Server {
-    /// Creates a new toyDB server.
+    /// Creates a new tootDB server.
     pub async fn new(
         id: &str,
         peers: HashMap<String, String>,

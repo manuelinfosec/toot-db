@@ -1,6 +1,6 @@
-# toyDB Architecture
+# tootDB Architecture
 
-At the highest level, toyDB consists of a cluster of nodes that execute SQL transactions against
+At the highest level, tootDB consists of a cluster of nodes that execute SQL transactions against
 a replicated state machine. Clients can connect to any node in the cluster and submit SQL
 statements. It aims to provide
 [linearizability](https://jepsen.io/consistency/models/linearizable) (i.e. strong consistency)
@@ -36,7 +36,7 @@ design choices.
 
 ## Node Components
 
-A toyDB node consists of three main components:
+A tootDB node consists of three main components:
 
 * **Storage engine:** stores data and manages transactions, on disk and in memory.
 
@@ -44,10 +44,10 @@ A toyDB node consists of three main components:
 
 * **SQL engine:** parses, plans, and executes SQL statements for clients.
 
-These components are integrated in the toyDB server, which handles network communication with
+These components are integrated in the tootDB server, which handles network communication with
 clients and other nodes. The following diagram illustrates its internal structure:
 
-![toyDB architecture](./images/architecture.svg)
+![tootDB architecture](./images/architecture.svg)
 
 At the bottom is a simple [key/value store](https://en.wikipedia.org/wiki/Key–value_database), 
 which stores all SQL data. This is wrapped inside an
@@ -67,7 +67,7 @@ the Raft cluster as if it was local storage. The SQL engine manages client SQL s
 take SQL queries as text, parse them, generate query plans, and execute them against the SQL
 storage engine.
 
-Surrounding these components is the toyDB server, which in addition to network communication also
+Surrounding these components is the tootDB server, which in addition to network communication also
 handles configuration, logging, and other process-level concerns.
 
 ## Storage Engine
@@ -83,7 +83,7 @@ The SQL storage engine will be discussed separately in the [SQL section](#sql-en
 
 A key/value storage engine stores arbitrary key/value pairs as binary byte slices, and implements
 the
-[`storage::kv::Store`](https://github.com/erikgrinaker/toydb/blob/master/src/storage/kv/mod.rs) 
+[`storage::kv::Store`](https://github.com/erikgrinaker/tootdb/blob/master/src/storage/kv/mod.rs) 
 trait:
 
 ```rust
@@ -130,13 +130,13 @@ encoding:
   `0x03`=`Integer`, `0x04`=`String`
 
 The default key/value store is
-[`storage::kv::Memory`](https://github.com/erikgrinaker/toydb/blob/master/src/storage/kv/memory.rs).
+[`storage::kv::Memory`](https://github.com/erikgrinaker/tootdb/blob/master/src/storage/kv/memory.rs).
 This is an in-memory [B+tree](https://en.wikipedia.org/wiki/B%2B_tree), a search tree
 variant with multiple keys per node (to make use of cache locality) and values only in leaf nodes.
 As key/value pairs are added and removed, tree nodes are split, merged, and rotated to keep them 
 balanced and at least half-full.
 
-Although key/value data is stored in memory, toyDB provides durability via the Raft log which
+Although key/value data is stored in memory, tootDB provides durability via the Raft log which
 is persisted to disk. On startup, the Raft log is replayed to populate the in-memory store.
 
 #### Key/Value Tradeoffs
@@ -144,15 +144,15 @@ is persisted to disk. On startup, the Raft log is replayed to populate the in-me
 **In-memory storage:** storing key/value data in memory has much better performance and is
 simpler to implement than on-disk storage, but requires that the data set fits in memory.
 Replaying the Raft log on startup can also take considerable time for large data sets. However,
-as toyDB datasets are expected to be small, this is mostly advantageous.
+as tootDB datasets are expected to be small, this is mostly advantageous.
 
 **Byte serialization:** since the primary storage is in memory, (de)serializing key/value
-pairs adds significant unnecessary overhead. However, at the outset it was not clear that toyDB
+pairs adds significant unnecessary overhead. However, at the outset it was not clear that tootDB
 would use in-memory storage, and byte slices is a simple interface that can be used regardless
 of storage medium.
 
 **B+tree scans:** B+trees often have pointers between neighboring leaf nodes for more efficient
-range scans, but toyDB's implementation does not. This would complicate the implementation, and
+range scans, but tootDB's implementation does not. This would complicate the implementation, and
 the performance benefits are usually not as great in memory where random access latency is low.
 However, this along with other implementation details cause range scans to be O(log n) rather
 than O(1) per step.
@@ -168,8 +168,8 @@ is a relatively simple concurrency control mechanism that provides
 [snapshot isolation](https://en.wikipedia.org/wiki/Snapshot_isolation) without taking out locks or 
 having writes block reads. It also versions all data, allowing querying of historical data.
 
-toyDB implements MVCC at the key/value layer as
-[`storage::kv::MVCC`](https://github.com/erikgrinaker/toydb/blob/master/src/storage/kv/mvcc.rs),
+tootDB implements MVCC at the key/value layer as
+[`storage::kv::MVCC`](https://github.com/erikgrinaker/tootdb/blob/master/src/storage/kv/mvcc.rs),
 using any `storage::kv::Store` implementation for underlying storage. `begin` returns a new
 transaction, which provides the usual key/value operations such as `get`, `set`, and `scan`.
 Additionally, it has a `commit` method which persists the changes and makes them visible to
@@ -225,7 +225,7 @@ which was considered unnecessary for a first version - it may be implemented lat
 However, this also allows for complete data history, and simplifies the implementation.
 
 **Transaction ID overflow:** transaction IDs will overflow after 64 bits, but this is never going to
-happen with toyDB.
+happen with tootDB.
 
 ### Log-structured Storage
 
@@ -233,7 +233,7 @@ The Raft node needs to keep a log of state machine commands encoded as arbitrary
 This log is mostly append-only, and storing it in a random-access key/value store would be
 slower and more complex than using a log-structured store purpose-built for this access pattern.
 
-Log stores implement the [`storage::log::Store`](https://github.com/erikgrinaker/toydb/blob/master/src/storage/log/mod.rs)
+Log stores implement the [`storage::log::Store`](https://github.com/erikgrinaker/tootdb/blob/master/src/storage/log/mod.rs)
 trait, a subset of which includes:
 
 ```rust
@@ -263,8 +263,8 @@ change, removing a number of uncommitted entries.
 Additionally, the store must be able to store a handful of arbitrary key/value metadata pairs
 for the Raft node, via `set_metadata(key, value)` and `get_metadata(key)` methods.
 
-The default log store in toyDB is
-[`storage::log::Hybrid`](https://github.com/erikgrinaker/toydb/blob/master/src/storage/log/hybrid.rs),
+The default log store in tootDB is
+[`storage::log::Hybrid`](https://github.com/erikgrinaker/tootdb/blob/master/src/storage/log/hybrid.rs),
 which stores uncommitted entries in memory and committed entries on disk. This allows the log to
 be written append-only and in order, giving very good performance both for writes and bulk
 reads. The number of uncommitted entries is also generally small since consensus is generally
@@ -285,47 +285,47 @@ time-consuming, and the index requires a bit of memory. However, this avoids hav
 separate index storage, which could be expensive to fsync, and data sets are expected to be small.
 
 **Metadata storage:** metadata key/value pairs should be stored in e.g. an on-disk B-tree
-key/value store, but toyDB current does not have such a store. However, the number of metadata items
+key/value store, but tootDB current does not have such a store. However, the number of metadata items
 is very small - specifically 1: the current Raft term/vote tuple.
 
 **Memory buffering:** buffering uncommitted entries in memory may require a lot of memory if
-consensus halts, e.g. due to loss of quorum. However, for toyDB use-cases this is not a major
+consensus halts, e.g. due to loss of quorum. However, for tootDB use-cases this is not a major
 problem, and it avoid having to do additional (possibly random) disk IO, greatly improving
 performance.
 
 **Garbage collection:** there is no garbage collection of old log entries, so the log will grow
-without bound. However, this is a necessity since the the default toyDB configuration uses
+without bound. However, this is a necessity since the the default tootDB configuration uses
 in-memory key/value storage by default and there is no other durable storage.
 
 ## Raft Consensus Engine
 
 The Raft consensus protocol is explained well in the
 [original Raft paper](https://raft.github.io/raft.pdf), and will not be repeated here - refer to
-it for details. toyDB's implementation follows the paper fairly closely.
+it for details. tootDB's implementation follows the paper fairly closely.
 
-The Raft node [`raft::Node`](https://github.com/erikgrinaker/toydb/tree/master/src/raft/node) is
+The Raft node [`raft::Node`](https://github.com/erikgrinaker/tootdb/tree/master/src/raft/node) is
 the core of the implementation, a finite state machine with enum variants for the node roles:
 leader, follower, and candidate. This enum wraps the `RoleNode` struct, which contains common
 node functionality and is generic over the specific roles `Leader`, `Follower`, and `Candidate`
 that implement the Raft protocol.
 
 Nodes are initialized with an ID and a list of peer IDs, and communicate by passing
-[`raft::Message`](https://github.com/erikgrinaker/toydb/blob/master/src/raft/message.rs)
+[`raft::Message`](https://github.com/erikgrinaker/tootdb/blob/master/src/raft/message.rs)
 messages. Inbound messages are received via `Node.step()` calls, and outbound messages are sent
 via an `mpsc` channel. Nodes also use a logical clock to keep track of e.g. election timeouts
 and heartbeats, and the clock is ticked at regular intervals via `Node.tick()` calls. These
 methods are synchronous and may cause state transitions, e.g. changing a candidate into a leader
 when it receives the winning vote.
 
-Nodes have a command log [`raft::Log`](https://github.com/erikgrinaker/toydb/blob/master/src/raft/log.rs),
+Nodes have a command log [`raft::Log`](https://github.com/erikgrinaker/tootdb/blob/master/src/raft/log.rs),
 using a `storage::log::Store` for storage. Leaders receive client commands via request messages,
 replicate them to peers, and commit the commands to the log subject to consensus. Once a command is
 committed, is it applied to the state machine asynchronously.
 
 The Raft-managed state machine (i.e. the SQL storage engine) implements the
-[`raft::State`](https://github.com/erikgrinaker/toydb/blob/master/src/raft/state.rs) trait and
+[`raft::State`](https://github.com/erikgrinaker/tootdb/blob/master/src/raft/state.rs) trait and
 is given to the node on initialization. The state machine driver
-[`raft::Driver`](https://github.com/erikgrinaker/toydb/blob/master/src/raft/state.rs) has
+[`raft::Driver`](https://github.com/erikgrinaker/tootdb/blob/master/src/raft/state.rs) has
 ownership of the state machine, and runs in a separate thread (or rather, a
 [Tokio](https://tokio.rs) task) receiving instructions via an `mpsc` channel - this avoids
 long-running commands blocking the main Raft node from responding to messages.
@@ -368,11 +368,11 @@ storage engine, completing the chain.
 
 ### Types
 
-toyDB has a very simple type system, with the
-[`sql::DataType`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/types/mod.rs) enum 
+tootDB has a very simple type system, with the
+[`sql::DataType`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/types/mod.rs) enum 
 specifying the available data types: `Boolean`, `Integer`, `Float`, and `String`.
 
-The [`sql::Value`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/types/mod.rs) enum 
+The [`sql::Value`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/types/mod.rs) enum 
 represents a specific value using Rust's native type system, e.g. an integer value is 
 `Value::Integer(i64)`. This enum also specifies comparison, ordering, and formatting of values. The 
 special value `Value::Null` represents an unknown value of unknown type, following the rules of
@@ -381,7 +381,7 @@ special value `Value::Null` represents an unknown value of unknown type, followi
 Values can be grouped into a `Row`, which is an alias for `Vec<Value>`. The type `Rows` is an alias
 for a fallible row iterator, and `Column` is a result column containing a name.
 
-Expressions [`sql::Expression`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/types/expression.rs)
+Expressions [`sql::Expression`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/types/expression.rs)
 represent operations on values. For example, `(1 + 2) * 3` is represented as:
 
 ```rust
@@ -398,14 +398,14 @@ Calling `evaluate()` on the expression will recursively evaluate it, returning `
 
 ### Schemas
 
-The schema defines the tables [`sql::Table`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/schema.rs)
-and columns [`sql::Column`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/schema.rs)
-in a toyDB database. Tables have a name and a list of columns, while a column has several
+The schema defines the tables [`sql::Table`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/schema.rs)
+and columns [`sql::Column`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/schema.rs)
+in a tootDB database. Tables have a name and a list of columns, while a column has several
 attributes such as name, data type, and various constraints. They also have methods to
 validate rows and values, e.g. to make sure a value is of the correct type for a column
 or to enforce referential integrity.
 
-The schema is stored and managed with [`sql::Catalog`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/schema.rs),
+The schema is stored and managed with [`sql::Catalog`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/schema.rs),
 a trait implemented by the SQL storage engine:
 
 ```rust
@@ -426,8 +426,8 @@ pub trait Catalog {
 
 #### Schema Tradeoffs
 
-**Single database:** only a single, unnamed database is supported per toyDB cluster. This is
-sufficient for toyDB's use-cases, and simplifies the implementation.
+**Single database:** only a single, unnamed database is supported per tootDB cluster. This is
+sufficient for tootDB's use-cases, and simplifies the implementation.
 
 **Schema changes:** schema changes other than creating or dropping tables is not supported. This
 avoids complicated data migration logic, and allows using table/column names as storage identifiers 
@@ -435,7 +435,7 @@ avoids complicated data migration logic, and allows using table/column names as 
 
 ### Storage
 
-The SQL storage engine trait is [`sql::Engine`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/engine/mod.rs):
+The SQL storage engine trait is [`sql::Engine`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/engine/mod.rs):
 
 ```rust
 pub trait Engine: Clone {
@@ -485,11 +485,11 @@ pub trait Transaction: Catalog {
 ```
 
 The main SQL storage engine implementation is
-[`sql::engine::KV`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/engine/kv.rs), which 
+[`sql::engine::KV`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/engine/kv.rs), which 
 is built on top of an MVCC key/value store and its transaction functionality.
 
 The Raft SQL storage engine
-[`sql::engine::Raft`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/engine/raft.rs)
+[`sql::engine::Raft`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/engine/raft.rs)
 uses a Raft API client `raft::Client` to submit state machine commands specified by the enums 
 `Mutation` and `Query` to the local Raft node. It also provides a Raft state machine 
 `sql::engine::raft::State` which wraps a regular `sql::engine::KV` SQL storage engine and applies 
@@ -505,7 +505,7 @@ out of scope for the project.
 
 ### Parsing
 
-The SQL session [`sql::Session`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/engine/mod.rs)
+The SQL session [`sql::Session`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/engine/mod.rs)
 takes plain-text SQL queries via `execute()` and returns the result. The first step in this process 
 is to parse the query into an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
 (AST) which represents the query semantics. This happens as follows:
@@ -513,7 +513,7 @@ is to parse the query into an [abstract syntax tree](https://en.wikipedia.org/wi
 > SQL → Lexer → Tokens → Parser → AST
 
 The lexer
-[`sql::Lexer`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/parser/lexer.rs) takes
+[`sql::Lexer`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/parser/lexer.rs) takes
 a SQL string, splits it into pieces, and classifies them as tokens `sql::Token`. It does not
 care about the meaning of the tokens, but removes whitespace and tries to figure out if
 something is a number, string, keyword, and so on. It also does some basic pre-processing, such as
@@ -524,7 +524,7 @@ invalid:
 
 > `3.14 +UPDATE 'abc'` → `Token::Number("3.14")` `Token::Plus` `Token::Keyword(Keyword::Update)` `Token::String("abc")`
 
-The parser [`sql::Parser`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/parser/mod.rs)
+The parser [`sql::Parser`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/parser/mod.rs)
 iterates over the tokens generated by the lexer, interprets them, and builds an AST representing
 the semantic query. For example, `SELECT name, 2020 - birthyear AS age FROM people` 
 results in the following AST:
@@ -558,7 +558,7 @@ actually exists, or if the field `birthyear` is an integer - that is the job of 
 
 Notably, the parser also parses expressions, such as `1 + 2 * 3`. This is non-trivial due to
 precedence rules, i.e. `2 * 3` should be evaluated first, but not if there are parentheses
-around `(1 + 2)`. The toyDB parser uses the
+around `(1 + 2)`. The tootDB parser uses the
 [precedence climbing algorithm](https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing)
 for this. Also note that AST expressions are different from SQL engine expressions, and do not map 
 one-to-one. This is clearest in the case of function calls, where the parser does not know (or 
@@ -567,9 +567,9 @@ arguments. The planner will translate this into actual expressions that can be e
 
 ### Planning
 
-The SQL planner [`sql::Planner`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/plan/planner.rs)
+The SQL planner [`sql::Planner`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/plan/planner.rs)
 takes the AST generated by the parser and builds a SQL execution plan
-[`sql::Plan`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/plan/mod.rs), which is an 
+[`sql::Plan`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/plan/mod.rs), which is an 
 abstract representation of the steps necessary to execute the query. For example, the following 
 shows a simple query and corresponding execution plan, formatted as `EXPLAIN` output:
 
@@ -620,7 +620,7 @@ The planner generates a very naïve execution plan, primarily concerned with pro
 is _correct_ but not necessarily _fast_. This means that it will always do full table scans,
 always use [nested loop joins](https://en.wikipedia.org/wiki/Nested_loop_join), and so on. The plan 
 is then optimized by a series of optimizers implementing
-[`sql::Optimizer`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/plan/optimizer.rs):
+[`sql::Optimizer`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/plan/optimizer.rs):
 
 * `ConstantFolder`: pre-evaluates constant expressions to avoid having to re-evaluate them for each 
   row.
@@ -675,7 +675,7 @@ planning.
 ### Execution
 
 Every SQL plan node has a corresponding executor, implementing the
-[`sql::Executor`](https://github.com/erikgrinaker/toydb/blob/master/src/sql/execution/mod.rs) trait:
+[`sql::Executor`](https://github.com/erikgrinaker/tootdb/blob/master/src/sql/execution/mod.rs) trait:
 
 ```rust
 pub trait Executor<T: Transaction> {
@@ -708,13 +708,13 @@ Finally, the root `ResultSet` is returned to the client.
 
 ## Server
 
-The toyDB [`Server`](https://github.com/erikgrinaker/toydb/blob/master/src/server.rs) manages 
+The tootDB [`Server`](https://github.com/erikgrinaker/tootdb/blob/master/src/server.rs) manages 
 network traffic for the Raft and SQL engines, using the [Tokio](https://tokio.rs) async executor. 
 It opens TCP listeners on port `9605` for SQL clients and  `9705` for Raft peers, both using 
 length-prefixed [Bincode](https://github.com/servo/bincode)-encoded message passing via
 [Serde](https://serde.rs)-encoded Tokio streams as a protocol.
 
-The Raft server is split out to [`raft::Server`](https://github.com/erikgrinaker/toydb/blob/master/src/raft/server.rs),
+The Raft server is split out to [`raft::Server`](https://github.com/erikgrinaker/tootdb/blob/master/src/raft/server.rs),
 which runs a main [event loop](https://en.wikipedia.org/wiki/Event_loop) routing Raft messages 
 between the local Raft node, state machine driver, TCP peers, and local state machine clients (i.e. 
 the Raft SQL engine wrapper), as well as ticking the Raft logical clock at regular intervals. It 
@@ -725,8 +725,8 @@ The SQL server spawns a new Tokio task for each SQL client that connects, runnin
 SQL session from the SQL storage engine on top of Raft. It communicates with the client by passing
 `server::Request` and `server::Response` messages that are translated to `sql::Session` calls.
 
-The main [`toydb`](https://github.com/erikgrinaker/toydb/blob/master/src/bin/toydb.rs) binary
-simply initializes a toyDB server based on command-line arguments and configuration files, and then 
+The main [`tootdb`](https://github.com/erikgrinaker/tootdb/blob/master/src/bin/tootdb.rs) binary
+simply initializes a tootDB server based on command-line arguments and configuration files, and then 
 runs it via the Tokio runtime.
 
 #### Server Tradeoffs
@@ -736,7 +736,7 @@ out of scope for the project.
 
 ## Client
 
-The toyDB [`Client`](https://github.com/erikgrinaker/toydb/blob/master/src/client.rs) provides a 
+The tootDB [`Client`](https://github.com/erikgrinaker/tootdb/blob/master/src/client.rs) provides a 
 simple API for interacting with a server, mainly by executing SQL statements via `execute()` 
 returning `sql::ResultSet`. It also has the convenience method `with_txn()`, taking a closure 
 that executes a series of SQL statements while automatically catching and retrying serialization
@@ -746,6 +746,6 @@ There is also `client::Pool`, which manages a set of pre-connected clients that 
 for running short-lived queries in a multi-threaded application without incurring connection
 setup costs.
 
-The [`toysql`](https://github.com/erikgrinaker/toydb/blob/master/src/bin/toysql.rs) command-line
-client is a simple REPL client that connects to a server using the toyDB `Client` and continually 
+The [`tootsql`](https://github.com/erikgrinaker/tootdb/blob/master/src/bin/tootsql.rs) command-line
+client is a simple REPL client that connects to a server using the tootDB `Client` and continually 
 prompts the user for a SQL query to execute, displaying the returned result.

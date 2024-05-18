@@ -1,6 +1,6 @@
 /*
- * toydb is the toyDB server. It takes configuration via a configuration file, command-line
- * parameters, and environment variables, then starts up a toyDB TCP server that communicates with
+ * tootdb is the tootDB server. It takes configuration via a configuration file, command-line
+ * parameters, and environment variables, then starts up a tootDB TCP server that communicates with
  * SQL clients (port 9605) and Raft peers (port 9705).
  */
 
@@ -9,9 +9,9 @@
 use clap::{app_from_crate, crate_authors, crate_description, crate_name, crate_version};
 use serde_derive::Deserialize;
 use std::collections::HashMap;
-use toydb::error::{Error, Result};
-use toydb::storage;
-use toydb::Server;
+use tootdb::error::{Error, Result};
+use tootdb::storage;
+use tootdb::Server;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -22,7 +22,7 @@ async fn main() -> Result<()> {
                 .long("config")
                 .help("Configuration file path")
                 .takes_value(true)
-                .default_value("/etc/toydb.yaml"),
+                .default_value("/etc/tootdb.yaml"),
         )
         .get_matches();
     let cfg = Config::new(opts.value_of("config").unwrap())?;
@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
     let loglevel = cfg.log_level.parse::<simplelog::LevelFilter>()?;
     let mut logconfig = simplelog::ConfigBuilder::new();
     if loglevel != simplelog::LevelFilter::Debug {
-        logconfig.add_filter_allow_str("toydb");
+        logconfig.add_filter_allow_str("tootdb");
     }
     simplelog::SimpleLogger::init(loglevel, logconfig.build())?;
 
@@ -70,18 +70,18 @@ struct Config {
 impl Config {
     fn new(file: &str) -> Result<Self> {
         let mut c = config::Config::new();
-        c.set_default("id", "toydb")?;
+        c.set_default("id", "tootdb")?;
         c.set_default("peers", HashMap::<String, String>::new())?;
         c.set_default("listen_sql", "0.0.0.0:9605")?;
         c.set_default("listen_raft", "0.0.0.0:9705")?;
         c.set_default("log_level", "info")?;
-        c.set_default("data_dir", "/var/lib/toydb")?;
+        c.set_default("data_dir", "/var/lib/tootdb")?;
         c.set_default("sync", true)?;
         c.set_default("storage_raft", "hybrid")?;
         c.set_default("storage_sql", "memory")?;
 
         c.merge(config::File::with_name(file))?;
-        c.merge(config::Environment::with_prefix("TOYDB"))?;
+        c.merge(config::Environment::with_prefix("tootDB"))?;
         Ok(c.try_into()?)
     }
 }

@@ -1,5 +1,5 @@
 # The node ID, peer ID/address map (empty for single node), and log level.
-id: toydb
+id: tootdb
 peers: {}
 log_level: INFO
 
@@ -11,7 +11,7 @@ listen_raft: 0.0.0.0:9705
 # persisted to disk, but has a high performance penalty. Disabling fsync and relying on cluster
 # redundancy for data durability may be a reasonable trade-off, although this can compromise Raft
 # linearizability guarantees in rare edge cases where committed entries lose majority.
-data_dir: /var/lib/toydb
+data_dir: /var/lib/tootdb
 sync: true
 
 # Raft log storage engine

@@ -1,7 +1,7 @@
 ///! Evaluates SQL expressions and compares with expectations.
-use toydb::error::{Error, Result};
-use toydb::sql::engine::Engine;
-use toydb::sql::types::Value;
+use tootdb::error::{Error, Result};
+use tootdb::sql::engine::Engine;
+use tootdb::sql::types::Value;
 
 fn eval_expr(expr: &str) -> Result<Value> {
     let engine = super::setup(Vec::new())?;

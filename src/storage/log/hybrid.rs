@@ -272,7 +272,7 @@ impl<'a> Read for MutexReader<'a> {
 #[cfg(test)]
 impl super::TestSuite<Hybrid> for Hybrid {
     fn setup() -> Result<Self> {
-        let dir = tempdir::TempDir::new("toydb")?;
+        let dir = tempdir::TempDir::new("tootdb")?;
         Hybrid::new(dir.as_ref(), false)
     }
 }
@@ -285,7 +285,7 @@ fn tests() -> Result<()> {
 
 #[test]
 fn test_persistent() -> Result<()> {
-    let dir = tempdir::TempDir::new("toydb")?;
+    let dir = tempdir::TempDir::new("tootdb")?;
     let mut l = Hybrid::new(dir.as_ref(), true)?;
 
     l.append(vec![0x01])?;

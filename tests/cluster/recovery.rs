@@ -1,7 +1,7 @@
 use super::super::{assert_row, setup};
 
-use toydb::error::{Error, Result};
-use toydb::sql::types::Value;
+use tootdb::error::{Error, Result};
+use tootdb::sql::types::Value;
 
 use serial_test::serial;
 

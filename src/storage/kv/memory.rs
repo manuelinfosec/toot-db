@@ -608,7 +608,7 @@ impl Values {
 
 /// A key range scan.
 /// FIXME This is O(log n), and should use the normal B+tree approach of storing pointers in
-/// the leaf nodes instead. See: https://github.com/erikgrinaker/toydb/issues/32
+/// the leaf nodes instead. See: https://github.com/erikgrinaker/tootdb/issues/32
 struct Iter {
     /// The root node of the tree we're iterating across.
     root: Arc<RwLock<Node>>,

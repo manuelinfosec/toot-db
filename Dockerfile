@@ -7,7 +7,7 @@ RUN rustup target add $TARGET
 
 # FIXME: cargo does not have an option to only build dependencies, so we build
 # a dummy main.rs. See: https://github.com/rust-lang/cargo/issues/2644
-WORKDIR /usr/src/toydb
+WORKDIR /usr/src/tootdb
 
 COPY Cargo.toml Cargo.lock ./
 RUN mkdir src \
@@ -15,13 +15,13 @@ RUN mkdir src \
     && echo "fn main() {}" >build.rs
 RUN cargo fetch --target=$TARGET
 RUN cargo build --release --target=$TARGET \
-    && rm -rf build.rs src target/$TARGET/release/toydb*
+    && rm -rf build.rs src target/$TARGET/release/tootdb*
 
 COPY . .
-RUN cargo install --bin toydb --locked --offline --path . --target=$TARGET
+RUN cargo install --bin tootdb --locked --offline --path . --target=$TARGET
 
 # Runtime image
 FROM alpine:3.14
-COPY --from=build /usr/local/cargo/bin/toydb /usr/local/bin/toydb
-COPY --from=build /usr/src/toydb/config/toydb.yaml /etc/toydb.yaml
-CMD ["toydb"]
+COPY --from=build /usr/local/cargo/bin/tootdb /usr/local/bin/tootdb
+COPY --from=build /usr/src/tootdb/config/tootdb.yaml /etc/tootdb.yaml
+CMD ["tootdb"]

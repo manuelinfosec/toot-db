@@ -26,7 +26,7 @@ type Connection = tokio_serde::Framed<
 /// Number of serialization retries in with_txn()
 const WITH_TXN_RETRIES: u8 = 8;
 
-/// A toyDB client
+/// A tootDB client
 #[derive(Clone)]
 pub struct Client {
     conn: Arc<Mutex<Connection>>,
@@ -157,7 +157,7 @@ impl Client {
     }
 }
 
-/// A toyDB client pool
+/// A tootDB client pool
 pub struct Pool {
     clients: Vec<Mutex<Client>>,
 }

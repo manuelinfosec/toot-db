@@ -1,67 +1,67 @@
 version: "3.7"
 
 networks:
-  toydb:
-    name: toydb
+  tootdb:
+    name: tootdb
     ipam:
       driver: default
       config:
       - subnet: 172.20.0.0/24
 
 services:
-  toydb-a: &toydb
+  tootdb-a: &tootdb
     build: ..
     environment:
-    - TOYDB_LOG_LEVEL
+    - tootDB_LOG_LEVEL
     volumes:
-    - ./toydb-a/toydb.yaml:/etc/toydb.yaml
-    - ./toydb-a/data:/var/lib/toydb
+    - ./tootdb-a/tootdb.yaml:/etc/tootdb.yaml
+    - ./tootdb-a/data:/var/lib/tootdb
     networks:
-      toydb:
+      tootdb:
         ipv4_address: 172.20.0.101
     ports:
     - 9601:9605
 
-  toydb-b:
-    <<: *toydb
+  tootdb-b:
+    <<: *tootdb
     volumes:
-    - ./toydb-b/toydb.yaml:/etc/toydb.yaml
-    - ./toydb-b/data:/var/lib/toydb
+    - ./tootdb-b/tootdb.yaml:/etc/tootdb.yaml
+    - ./tootdb-b/data:/var/lib/tootdb
     networks:
-      toydb:
+      tootdb:
         ipv4_address: 172.20.0.102
     ports:
     - 9602:9605
 
-  toydb-c:
-    <<: *toydb
+  tootdb-c:
+    <<: *tootdb
     volumes:
-    - ./toydb-c/toydb.yaml:/etc/toydb.yaml
-    - ./toydb-c/data:/var/lib/toydb
+    - ./tootdb-c/tootdb.yaml:/etc/tootdb.yaml
+    - ./tootdb-c/data:/var/lib/tootdb
     networks:
-      toydb:
+      tootdb:
         ipv4_address: 172.20.0.103
     ports:
     - 9603:9605
 
-  toydb-d:
-    <<: *toydb
+  tootdb-d:
+    <<: *tootdb
     volumes:
-    - ./toydb-d/toydb.yaml:/etc/toydb.yaml
-    - ./toydb-d/data:/var/lib/toydb
+    - ./tootdb-d/tootdb.yaml:/etc/tootdb.yaml
+    - ./tootdb-d/data:/var/lib/tootdb
     networks:
-      toydb:
+      tootdb:
         ipv4_address: 172.20.0.104
     ports:
     - 9604:9605
 
-  toydb-e:
-    <<: *toydb
+  tootdb-e:
+    <<: *tootdb
     volumes:
-    - ./toydb-e/toydb.yaml:/etc/toydb.yaml
-    - ./toydb-e/data:/var/lib/toydb
+    - ./tootdb-e/tootdb.yaml:/etc/tootdb.yaml
+    - ./tootdb-e/data:/var/lib/tootdb
     networks:
-      toydb:
+      tootdb:
         ipv4_address: 172.20.0.105
     ports:
     - 9605:9605
